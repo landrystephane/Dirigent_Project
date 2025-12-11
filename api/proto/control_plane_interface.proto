@@ -1,0 +1,77 @@
+syntax = "proto3";
+package data_plane;
+
+option go_package = "github.com/eth-easl/cluster_manager/api/proto";
+
+import "common.proto";
+import "raft.proto";
+
+import "google/protobuf/empty.proto";
+
+message NodeInfo {
+  string NodeID = 1;
+  string IP = 2;
+  int32 Port = 3;
+  uint64 CpuCores = 4;
+  uint64 MemorySize = 5;
+}
+
+message NodeHeartbeatMessage {
+  string NodeID = 1;
+  uint64 CpuUsage = 2;
+  uint64 MemoryUsage = 3;
+}
+
+message AutoscalingMetric {
+  string ServiceName = 1;
+  string DataplaneName = 2;
+  int32 InflightRequests = 3;
+}
+
+message DataplaneInfo {
+  string IP = 1;
+  int32 APIPort = 2;
+  int32 ProxyPort = 3;
+}
+
+enum FailureType {
+  SANDBOX_FAILURE = 0;
+  SANDBOX_DAEMON_FAILURE = 1;
+  WORKER_NODE_FAILURE = 2;
+}
+
+message Failure {
+  FailureType Type = 1;
+  string ServiceName = 2;
+  repeated string SandboxIDs = 3;
+}
+
+message HAProxyConfig {
+  repeated string Dataplanes = 1;
+  repeated string RegistrationServers = 2;
+}
+
+service CpiInterface {
+  rpc OnMetricsReceive(AutoscalingMetric) returns (ActionStatus);
+  rpc ListServices(google.protobuf.Empty) returns (ServiceList);
+
+  rpc RegisterDataplane(DataplaneInfo) returns (ActionStatus);
+  rpc RegisterService(ServiceInfo) returns (ActionStatus);
+  rpc RegisterNode(NodeInfo) returns (ActionStatus);
+  rpc NodeHeartbeat(NodeHeartbeatMessage) returns (ActionStatus);
+
+  rpc ReportFailure(Failure) returns (ActionStatus);
+
+  rpc DeregisterDataplane(DataplaneInfo) returns (ActionStatus);
+  rpc DeregisterNode(NodeInfo) returns (ActionStatus);
+  rpc DeregisterService(ServiceInfo) returns (ActionStatus);
+
+  rpc ResetMeasurements(google.protobuf.Empty) returns (ActionStatus);
+
+  // RAFT leader election
+  rpc RequestVote(RequestVoteArgs) returns (RequestVoteReply);
+  rpc AppendEntries(AppendEntriesArgs) returns (AppendEntriesReply);
+
+  // HAProxy
+  rpc ReviseHAProxyConfiguration(HAProxyConfig) returns (ActionStatus);
+}

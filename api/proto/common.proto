@@ -1,0 +1,69 @@
+syntax = "proto3";
+package data_plane;
+
+option go_package = "github.com/eth-easl/cluster_manager/api/proto";
+
+enum L4Protocol {
+  TCP = 0;
+  UDP = 1;
+}
+
+message PortMapping {
+  int32 HostPort = 1;
+  int32 GuestPort = 2;
+  L4Protocol Protocol = 3;
+}
+
+message AutoscalingConfiguration {
+  int32 ScalingUpperBound = 1;
+  int32 ScalingLowerBound = 2;
+  float PanicThresholdPercentage = 3;
+  float MaxScaleUpRate = 4;
+  float MaxScaleDownRate = 5;
+  int32 ContainerConcurrency = 6;
+  int32 ContainerConcurrencyTargetPercentage = 7;
+  int32 StableWindowWidthSeconds = 8;
+  int32 PanicWindowWidthSeconds = 9;
+  int32 ScalingPeriodSeconds = 10;
+  int32 ScalingMethod = 11;
+}
+
+message ServiceInfo {
+  string Name = 1;
+  string Image = 2;
+  uint64 RequestedCpu = 3;
+  uint64 RequestedMemory = 4;
+  PortMapping PortForwarding = 5;
+  AutoscalingConfiguration AutoscalingConfig = 6;
+}
+
+message ServiceList {
+  repeated string Service = 1;
+}
+
+message ActionStatus {
+  bool Success = 1;
+  string Message = 2;
+}
+
+message DataplaneInformation {
+  string Address = 1;
+  string ApiPort = 2;
+  string ProxyPort = 3;
+}
+
+message WorkerNodeInformation {
+  string Name = 1;
+  string Ip = 2;
+  string Port = 3;
+  uint64 CpuCores = 4;
+  uint64 Memory = 5;
+}
+
+message Endpoint {
+  string SandboxID = 1;
+  string URL = 2;
+  string NodeName = 3;
+  string ServiceName = 4;
+  int32 HostPort = 5;
+}

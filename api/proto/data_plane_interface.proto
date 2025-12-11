@@ -1,0 +1,32 @@
+syntax = "proto3";
+package data_plane;
+
+option go_package = "github.com/eth-easl/cluster_manager/api/proto";
+
+import "common.proto";
+import "google/protobuf/empty.proto";
+
+message EndpointInfo {
+  string ID = 1;
+  string URL = 2;
+}
+
+message DeploymentEndpointPatch {
+  ServiceInfo Service = 1;
+  repeated EndpointInfo Endpoints = 2;
+}
+
+message DeploymentUpdateSuccess {
+  bool Success = 1;
+  string Message = 2;
+}
+
+service DpiInterface {
+  rpc AddDeployment(ServiceInfo) returns (DeploymentUpdateSuccess);
+  rpc DeleteDeployment(ServiceInfo) returns (DeploymentUpdateSuccess);
+
+  rpc UpdateEndpointList(DeploymentEndpointPatch) returns (DeploymentUpdateSuccess);
+  rpc DrainSandbox(DeploymentEndpointPatch) returns (DeploymentUpdateSuccess);
+
+  rpc ResetMeasurements(google.protobuf.Empty) returns (ActionStatus);
+}
