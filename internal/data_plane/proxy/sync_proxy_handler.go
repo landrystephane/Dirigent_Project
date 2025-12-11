@@ -112,12 +112,12 @@ func (ps *ProxyingService) createInvocationHandler(next http.Handler) http.Handl
 		if metadata == nil {
 			// Request function has not been deployed
 			w.WriteHeader(http.StatusNotFound)
-			logrus.Trace("Invocation for non-existing service ", serviceName, " has been dumped.")
+			logrus.Info("Invocation for non-existing service ", serviceName, " has been dumped.")
 
 			return
 		}
 
-		logrus.Trace("Invocation for service ", serviceName, " has been received.")
+		logrus.Info("Invocation for service ", serviceName, " has been received.")
 
 		///////////////////////////////////////////////
 		// COLD/WARM START
@@ -132,7 +132,7 @@ func (ps *ProxyingService) createInvocationHandler(next http.Handler) http.Handl
 		go contextTerminationHandler(request, coldStartChannel)
 
 		if coldStartChannel != nil {
-			logrus.Debug("Enqueued invocation for ", serviceName)
+			logrus.Info("Enqueued invocation for ", serviceName)
 
 			// wait until a cold start is resolved
 			coldStartWaitTime := time.Now()
@@ -143,7 +143,7 @@ func (ps *ProxyingService) createInvocationHandler(next http.Handler) http.Handl
 
 			if waitOutcome.Outcome == common.CanceledColdStart {
 				w.WriteHeader(http.StatusGatewayTimeout)
-				logrus.Warnf("Invocation context canceled for %s.", serviceName)
+				logrus.Info("Invocation context canceled for %s.", serviceName)
 
 				return
 			}
