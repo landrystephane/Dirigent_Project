@@ -29,11 +29,11 @@ import (
 	"cluster_manager/internal/worker_node/sandbox"
 	"context"
 	"fmt"
+	"math/rand"
+
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/durationpb"
 	"google.golang.org/protobuf/types/known/emptypb"
-	"math/rand"
-	"time"
 )
 
 type Runtime struct {
@@ -45,7 +45,6 @@ func NewFakeSnapshotRuntime() *Runtime {
 }
 
 func (fsr *Runtime) CreateSandbox(_ context.Context, in *proto.ServiceInfo) (*proto.SandboxCreationStatus, error) {
-	time.Sleep(40 * time.Millisecond)
 	logrus.Debugf("Fake sandbox created successfully.")
 
 	zeroDuration := durationpb.New(0)
@@ -54,8 +53,8 @@ func (fsr *Runtime) CreateSandbox(_ context.Context, in *proto.ServiceInfo) (*pr
 		Success: true,
 		ID:      fmt.Sprintf("dummy-sandbox-%d", rand.Int()),
 		PortMappings: &proto.PortMapping{
-			HostPort:  80,
-			GuestPort: 80,
+			HostPort:  6000,
+			GuestPort: 6000,
 			Protocol:  proto.L4Protocol_TCP,
 		},
 		LatencyBreakdown: &proto.SandboxCreationBreakdown{
