@@ -1,4 +1,4 @@
-dataPlaneIp: "10.200.0.13"
+dataPlaneIp: "10.200.0.15"
 controlPlaneAddress: "10.200.0.12:9090"
 portProxy: "8080"
 portGRPC: "8081"
